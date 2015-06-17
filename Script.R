@@ -5,6 +5,7 @@
 library(readxl)
 library(ggplot2)
 library(data.table)
+library(dplyr)
 
 list.files()
 ls("package:readxl")
@@ -13,46 +14,94 @@ ls("package:readxl")
 data14 <- data.table(read_excel("data_vice.xlsx", sheet=2))
 str(data14)
 dim(data14)
+head(data14)
 unlist(lapply(data14, class))
 colnames(data14)
 
 data14$MIEMBROS <- as.numeric(data14$MIEMBROS)
-# Numero de miembros
-table(data14[,MIEMBROS])
-round(100*prop.table(table(data14[,MIEMBROS])), 2)
-
 data14$ING_ESTUDIANTE <- as.numeric(data14$ING_ESTUDIANTE)
 data14$ING_CONYUGE <- as.numeric(data14$ING_CONYUGE)
 data14$ING_PADRE <- as.numeric(data14$ING_PADRE)
 data14$ING_MADRE <- as.numeric(data14$ING_MADRE)
 data14$MIEMBROS <- as.numeric(data14$MIEMBROS)
 
-# Ingreso total
-data14[,ING_TOTAL:=ING_ESTUDIANTE+ING_CONYUGE+ING_PADRE+ING_MADRE]
-summary(data14[,.(ING_ESTUDIANTE, ING_CONYUGE, ING_PADRE, ING_MADRE, ING_TOTAL)])
-
-# Ingreso por persona
+data14[, ING_TOTAL:=ING_ESTUDIANTE+ING_CONYUGE+ING_PADRE+ING_MADRE]
 data14[, ING_PERSONA:= ING_TOTAL/MIEMBROS]
-summary(data14[,ING_PERSONA])
-Ing <- data.frame(Percentil=seq(10,90, by=10), Ingreso=round(quantile(data14[,ING_PERSONA], probs = seq(0.1, 0.9, by=0.1)), 2))
 
-ggplot(Ing, aes(x=Percentil, y=Ingreso)) + geom_line(size=1.3) + geom_point(size=4, shape=21, fill="white") + 
-      labs(title='Ingreso por Miembro Familiar')
+# Filtro Previo - Solteros e ingresos superiores a cero
+datos14 <- data14 %>% select(MIEMBROS, EST_CIVIL, GENERO, TIP_COLEGIO, ING_TOTAL, ING_PERSONA) %>% 
+      filter(ING_TOTAL > 0, ING_TOTAL < 30000, EST_CIVIL == "S")
 
+## Estadisticos descriptivos
+table(datos14[,MIEMBROS])
+round(100*prop.table(table(datos14[,MIEMBROS])), 2)
 
-ggplot(data14, aes(x=factor(TIP_COLEGIO), y=ING_PERSONA)) +
-      geom_boxplot(outlier.size=1.5, outlier.shape=21)
+ggplot(datos14, aes(x=1, y=ING_TOTAL)) + geom_boxplot(outlier.size=1.5, outlier.shape=21, outlier.colour="red") +
+      labs(y="Ingreso Familiar Total") + stat_boxplot(geom ='errorbar')
 
-ggplot(data14, aes(x=factor(PROVINCIA), y=ING_PERSONA)) +
-      geom_boxplot(outlier.size=1.5, outlier.shape=21)
+quantile(datos14[,ING_TOTAL], probs = seq(0.01, 0.99, by= 0.01))
 
-data14[,EDAD:=floor((as.Date("2015-06-16") - as.Date(data14$NACIMIENTO))/365)]
+# Base acotada al percentil 99
+datos14 <- data14 %>% select(MIEMBROS, EST_CIVIL, GENERO, TIP_COLEGIO, ING_TOTAL, ING_PERSONA) %>% 
+      filter(ING_TOTAL > 0, ING_TOTAL < 4300, EST_CIVIL == "S")
 
+ggplot(datos14, aes(x=1, y=ING_TOTAL)) + geom_boxplot(outlier.size=1.5, outlier.shape=21, outlier.colour="red") +
+      labs(y="Ingreso Familiar Total") + stat_boxplot(geom ='errorbar')
+
+quantile(datos14[,ING_TOTAL], probs = seq(0.01, 0.99, by= 0.01))
+
+# Ingreso total & persona
+summary(datos14[,.(ING_TOTAL, ING_PERSONA)])
+# Ingreso persona en quintiles
+quantile(datos14[,ING_PERSONA], probs = seq(0.2, 0.8, by= 0.2))
+
+# Ingreso por edad
+datos14[,EDAD:=floor((as.Date("2015-06-16") - as.Date(data14$NACIMIENTO))/365)]
 summary(as.numeric(data14[,EDAD]))
+
+
 
 ## Datos Año 2015
 data15 <- data.table(read_excel("data_vice.xlsx", sheet=1))
 str(data15)
 dim(data15)
+head(data15)
+unlist(lapply(data15, class))
+colnames(data15)
 
+data15$MIEMBROS <- as.numeric(data15$MIEMBROS)
+data15$ING_ESTUDIANTE <- as.numeric(data15$ING_ESTUDIANTE)
+data15$ING_CONYUGE <- as.numeric(data15$ING_CONYUGE)
+data15$ING_PADRE <- as.numeric(data15$ING_PADRE)
+data15$ING_MADRE <- as.numeric(data15$ING_MADRE)
+data15$MIEMBROS <- as.numeric(data15$MIEMBROS)
 
+data15[, ING_TOTAL:=ING_ESTUDIANTE+ING_CONYUGE+ING_PADRE+ING_MADRE]
+data15[, ING_PERSONA:= ING_TOTAL/MIEMBROS]
+
+# Filtro Previo - Solteros e ingresos superiores a cero
+datos15 <- data15 %>% select(MIEMBROS, EST_CIVIL, GENERO, TIP_COLEGIO, ING_TOTAL, ING_PERSONA) %>% 
+      filter(ING_TOTAL > 0, ING_TOTAL < 30000, EST_CIVIL == "S")
+
+## Estadisticos descriptivos
+table(datos15[, MIEMBROS])
+round(100*prop.table(table(datos15[,MIEMBROS])), 2)
+
+ggplot(datos15, aes(x=1, y=ING_TOTAL)) + geom_boxplot(outlier.size=1.5, outlier.shape=21, outlier.colour="red") +
+      labs(y="Ingreso Familiar Total") + stat_boxplot(geom ='errorbar')
+
+quantile(datos14[,ING_TOTAL], probs = seq(0.01, 0.99, by= 0.01))
+
+# Base acotada al percentil 99
+datos15 <- data15 %>% select(MIEMBROS, EST_CIVIL, GENERO, TIP_COLEGIO, ING_TOTAL, ING_PERSONA) %>% 
+      filter(ING_TOTAL > 0, ING_TOTAL < 3500, EST_CIVIL == "S")
+
+ggplot(datos15, aes(x=1, y=ING_TOTAL)) + geom_boxplot(outlier.size=1.5, outlier.shape=21, outlier.colour="red") +
+      labs(y="Ingreso Familiar Total") + stat_boxplot(geom ='errorbar')
+
+quantile(datos15[,ING_TOTAL], probs = seq(0.01, 0.99, by= 0.01))
+
+# Ingreso total & persona
+summary(datos15[,.(ING_TOTAL, ING_PERSONA)])
+# Ingreso persona en quintiles
+quantile(datos15[,ING_PERSONA], probs = seq(0.2, 0.8, by= 0.2))
