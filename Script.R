@@ -2,6 +2,7 @@
 ####  Analisis Matriculas EPN  ####
 ###################################
 
+install.packages('readxl', dependencies=TRUE)
 library(readxl)
 library(ggplot2)
 library(data.table)
@@ -9,6 +10,7 @@ library(dplyr)
 
 list.files()
 ls("package:readxl")
+ls("package:data.table")
 
 ## Datos Año 2014
 data14 <- data.table(read_excel("data_vice.xlsx", sheet=2))
