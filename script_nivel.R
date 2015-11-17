@@ -79,7 +79,8 @@ data %>% ggvis(~factor(N_PER), fill=~factor(N_PER), fillOpacity := 0.6) %>% laye
       add_axis("x",title="QUINTIL") %>% add_axis("y", title="ESTUDIANTES") %>% 
       add_legend("fill", title="QUINTIL")
 
-
+# Calculo de edad
+data %>% mutate(FECHA=ifelse(P_INICIO==""))
 
 
 
