@@ -17,7 +17,8 @@ data %>% select(PROMEDIO) %>% summary()
 # Var APRUEBA (0-NO, 1-SI)
 
 data <- data %>% mutate(APRUEBA=ifelse(PROMEDIO>0,1,0))
-data %>% select(APRUEBA) %>% table()
+var_dep <- data %>% select(APRUEBA) %>% table()
+names(var_dep) <- c("NO", "SI")
 
 # Var EDAD
 data <- data %>% rename(FENAC=`FECHA NACIMIENTO`, TIPO=`TIPO UNIDADEDUCATIVA`, INGRESO=`INGRESO FAMILIAR`,
@@ -76,8 +77,8 @@ data %>% mutate(TIPO_COL=ifelse(TIPO %in% c("PARTICULAR LAICO", "PARTICULAR RELI
 data$N_PER <- as.numeric(data$N_PER)
 
 data %>% ggvis(~factor(N_PER), fill=~factor(N_PER), fillOpacity := 0.6) %>% layer_bars() %>% 
-      add_axis("x",title="QUINTIL") %>% add_axis("y", title="ESTUDIANTES") %>% 
-      add_legend("fill", title="QUINTIL")
+      add_axis("x",title="PERIODOS") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="PERIODOS")
 
 # Calculo de edad
 data %>% mutate(FECHA=ifelse(P_INICIO==""))
