@@ -1,0 +1,113 @@
+---
+title: Indices de repetición en Propedéutico
+author: Departamento de Matemática
+date: Noviembre, 2015
+fontsize: 12pt
+widgets: [bootstrap, quiz]
+framework   : reveal.js        # {io2012, html5slides, shower, dzslides, ...}  ## io2012
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+mode        : selfcontained # {standalone, draft}
+output:
+  ioslides_presentation:
+    theme: cerulean
+    logo: epn.jpg
+    smaller: yes
+    transition: faster
+    widescreen: no
+    slidy_presentation: default
+---
+
+```{r, setup, echo = FALSE, message = FALSE}
+options(width = 75, warn = -1)
+library(knitr)
+library(dplyr)
+library(ggvis)
+opts_chunk$set(prompt = FALSE, comment = "#>", tidy = FALSE)
+library(readxl)
+load("Prepo.RData")
+```
+
+## Introducción {.build}
+
+Se analizaron los registros
+
+## Distribución por Género
+
+```{r, echo=FALSE}
+data %>% ggvis(~factor(GENERO), fill=~factor(GENERO), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="GENERO") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="GENERO")
+```
+
+## Distribución por Quintiles
+
+```{r, echo=FALSE}
+data$QUINTIL <- as.numeric(data$QUINTIL)
+
+data %>% ggvis(~factor(QUINTIL), fill=~factor(QUINTIL), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="QUINTIL") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="QUINTIL")
+```
+
+## Distribución por Región
+
+```{r, echo=FALSE}
+data %>% ggvis(~factor(REGION), fill=~factor(REGION), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="REGION") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="REGION")
+```
+
+## Distribución Región Costa
+
+```{r, echo=FALSE}
+data %>% filter(REGION=="COSTA") %>% ggvis(~factor(PROVINCIA), fill=~factor(PROVINCIA), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="PROVINCIA") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="PROVINCIA")
+```
+
+## Distribución Región Sierra
+
+```{r, echo=FALSE}
+data %>% filter(REGION=="SIERRA") %>% ggvis(~factor(PROVINCIA), fill=~factor(PROVINCIA), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="PROVINCIA") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="PROVINCIA")
+```
+
+## Distribución Región Amazónica
+
+```{r, echo=FALSE}
+data %>% filter(REGION=="AMAZONIA") %>% ggvis(~factor(PROVINCIA), fill=~factor(PROVINCIA), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="PROVINCIA") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="PROVINCIA")
+```
+
+## Distribución Estudiantes Extranjeros
+
+```{r, echo=FALSE}
+data %>% filter(REGION=="EXTRANJEROS") %>% ggvis(~factor(PAIS), fill=~factor(PAIS), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="PAIS") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="PAIS")
+```
+
+## Distribución Tipo Colegio
+
+```{r, echo=FALSE}
+data %>% mutate(TIPO_COL=ifelse(TIPO %in% c("PARTICULAR LAICO", "PARTICULAR RELIGIOSO"), "PARTICULAR", TIPO)) %>% 
+      ggvis(~factor(TIPO_COL), fill=~factor(TIPO_COL), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="TIPO COLEGIO") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="TIPO COLEGIO")
+```
+
+## Distribución Número de Periodos
+
+```{r, echo=FALSE}
+data$N_PER <- as.numeric(data$N_PER)
+
+data %>% ggvis(~factor(N_PER), fill=~factor(N_PER), fillOpacity := 0.6) %>% layer_bars() %>% 
+      add_axis("x",title="PERIODOS") %>% add_axis("y", title="ESTUDIANTES") %>% 
+      add_legend("fill", title="PERIODOS")
+```
+
+## Gracias
+
